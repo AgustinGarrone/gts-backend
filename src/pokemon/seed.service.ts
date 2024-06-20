@@ -53,7 +53,7 @@ export class SeedService {
           const [type] = await this.typeRepository.findOrCreate({
             where: { name: typeInfo.type.name },
           });
-          await PokemonType.create({
+          await this.pokemonTypeRepository.create({
             pokemonId: createdPokemon.id,
             typeId: type.id,
           });
@@ -70,7 +70,7 @@ export class SeedService {
             const [ability] = await this.abilityRepository.findOrCreate({
               where: { name: abilityName },
             });
-            await PokemonAbility.create({
+            await this.pokemonAbilityRepository.create({
               pokemonId: createdPokemon.id,
               abilityId: ability.id,
             });

@@ -8,6 +8,8 @@ import { pokemonProvider } from "./models/pokemon.model";
 import { SeedService } from "./pokemon/seed.service";
 import { typeProvider } from "./models/type.model";
 import { abilityProvider } from "./models/ability.model";
+import { pokemonTypesProvider } from "./models/pokemonTypes.model";
+import { pokemonAbilityProvider } from "./models/pokemonAbility.model";
 
 //TODO: modularizar
 @Module({
@@ -19,6 +21,8 @@ import { abilityProvider } from "./models/ability.model";
     ...pokemonProvider,
     ...typeProvider,
     ...abilityProvider,
+    ...pokemonAbilityProvider,
+    ...pokemonTypesProvider,
   ],
 })
 export class AppModule {}

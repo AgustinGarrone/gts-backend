@@ -13,9 +13,7 @@ export class AppService implements OnApplicationBootstrap {
     console.log(pokemonCount);
 
     if (pokemonCount === 0) {
-      //await this.seedService.seedTypes();
-      await this.seedService.seedAbilities();
-      console.log("seeded");
+      await this.seedService.seedPokemons();
     }
   }
 }

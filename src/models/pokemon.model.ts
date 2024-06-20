@@ -2,6 +2,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Table, Column, Model, BelongsToMany } from "sequelize-typescript";
 import { Ability } from "./ability.model";
 import { PokemonAbility } from "./pokemonAbility.model";
+import { Type } from "./type.model";
+import { PokemonType } from "./pokemonTypes.model";
 
 @Table({ tableName: "pokemons" })
 export class Pokemon extends Model<Pokemon> {
@@ -13,21 +15,21 @@ export class Pokemon extends Model<Pokemon> {
   @ApiProperty()
   name: string;
 
-  @Column({ allowNull: false })
+  @Column({ allowNull: true })
   @ApiProperty()
   image: string;
 
   @Column({ allowNull: false })
   @ApiProperty()
-  level: string;
-
-  @Column({ allowNull: false })
-  @ApiProperty()
-  type: string;
+  level: number;
 
   @BelongsToMany(() => Ability, () => PokemonAbility)
   @ApiProperty({ type: () => [Ability] })
   abilities: Ability[];
+
+  @BelongsToMany(() => Type, () => PokemonType)
+  @ApiProperty({ type: () => [Type] })
+  types: Type[];
 }
 
 export const pokemonProvider = [

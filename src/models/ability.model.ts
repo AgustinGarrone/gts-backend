@@ -3,7 +3,7 @@ import { Table, Column, Model, BelongsToMany } from "sequelize-typescript";
 import { Pokemon } from "./pokemon.model";
 import { PokemonAbility } from "./pokemonAbility.model";
 
-@Table({ tableName: "abilities" })
+@Table({ tableName: "abilities", timestamps: false })
 export class Ability extends Model<Ability> {
   @Column({ primaryKey: true, autoIncrement: true })
   @ApiProperty()

@@ -1,9 +1,14 @@
 import { Column, ForeignKey, Model, Table } from "sequelize-typescript";
 import { Pokemon } from "./pokemon.model";
 import { Type } from "./type.model";
+import { ApiProperty } from "@nestjs/swagger";
 
-@Table({ tableName: "pokemon_types" })
+@Table({ tableName: "pokemon_types", timestamps: false })
 export class PokemonType extends Model<PokemonType> {
+  @Column({ primaryKey: true, autoIncrement: true })
+  @ApiProperty()
+  id: number;
+
   @ForeignKey(() => Pokemon)
   @Column
   pokemonId: number;

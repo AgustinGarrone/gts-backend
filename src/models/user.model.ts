@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Table, Column, Model } from "sequelize-typescript";
+import { Table, Column, Model, HasMany } from "sequelize-typescript";
+import { Pokemon } from "./pokemon.model";
 
 @Table({ tableName: "users" })
 export class User extends Model<User> {
@@ -18,6 +19,9 @@ export class User extends Model<User> {
   @Column({ allowNull: false })
   @ApiProperty()
   password: string;
+
+  @HasMany(() => Pokemon, "ownerId")
+  pokemons: Pokemon[];
 }
 
 export const userProvider = [

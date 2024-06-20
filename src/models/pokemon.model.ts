@@ -1,9 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Table, Column, Model, BelongsToMany } from "sequelize-typescript";
+import {
+  Table,
+  Column,
+  Model,
+  BelongsToMany,
+  BelongsTo,
+} from "sequelize-typescript";
 import { Ability } from "./ability.model";
 import { PokemonAbility } from "./pokemonAbility.model";
 import { Type } from "./type.model";
 import { PokemonType } from "./pokemonTypes.model";
+import { User } from "./user.model";
 
 @Table({ tableName: "pokemons" })
 export class Pokemon extends Model<Pokemon> {
@@ -30,6 +37,9 @@ export class Pokemon extends Model<Pokemon> {
   @BelongsToMany(() => Type, () => PokemonType)
   @ApiProperty({ type: () => [Type] })
   types: Type[];
+
+  @BelongsTo(() => User, "ownerId")
+  owner: User;
 }
 
 export const pokemonProvider = [

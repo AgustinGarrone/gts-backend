@@ -76,6 +76,28 @@ export class PokemonController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post("/random")
+  async addRandomPokemon(
+    @GetUserFromJwt() user,
+  ): Promise<ApiResponse<Pokemon>> {
+    try {
+      const randomPokemon = await this.pokemonService.addRandomPokemon(
+        user.userId,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: "Pokemon agregado con exito",
+        data: randomPokemon,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete(":id")
   async deletePokemon(
     @GetUserFromJwt() user,

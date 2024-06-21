@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { Sequelize } from "sequelize-typescript";
 import { Pokemon } from "src/models/pokemon.model";
 import { User } from "src/models/user.model";
 
@@ -61,6 +62,34 @@ export class PokemonService {
     );
 
     return await this.pokemonRepository.findOne({ where: { id: pokemonId } });
+  }
+
+  async addRandomPokemon(userId: number) {
+    const existingUser = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!existingUser) {
+      throw new NotFoundException("Usuario no encontrado");
+    }
+
+    const randomPokemon = await this.pokemonRepository.findOne({
+      where: {
+        ownerId: null,
+      },
+      order: [Sequelize.fn("RANDOM")],
+    });
+
+    await this.pokemonRepository.update(
+      { ownerId: userId },
+      { where: { id: randomPokemon.id } },
+    );
+
+    return await this.pokemonRepository.findOne({
+      where: { id: randomPokemon.id },
+    });
   }
 
   async deletePokemon(userId: number, pokemonId: number): Promise<void> {

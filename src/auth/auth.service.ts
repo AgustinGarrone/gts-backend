@@ -1,4 +1,9 @@
-import { HttpException, Inject, Injectable } from "@nestjs/common";
+import {
+  ConflictException,
+  HttpException,
+  Inject,
+  Injectable,
+} from "@nestjs/common";
 import {
   CreateUserDTO,
   LoginResponse,
@@ -6,6 +11,7 @@ import {
 } from "./dto/create-auth.dto";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
+import { Op } from "sequelize";
 import { User } from "src/models/user.model";
 
 @Injectable()
@@ -17,24 +23,34 @@ export class AuthService {
   ) {}
 
   async register(userObject: CreateUserDTO): Promise<LoginResponse> {
-    try {
-      const { password } = userObject;
-      const saltRounds = 10;
-      const plainToHash = await bcrypt.hash(password, saltRounds);
-      userObject = { ...userObject, password: plainToHash };
-      const user = await this.userRepository.create(userObject);
+    const { password, username, email } = userObject;
 
-      const payload = { id: user.id, username: user.username };
-      const token = this.jwtAuthService.sign(payload);
+    const userDataExists = await this.userRepository.findOne({
+      where: {
+        [Op.or]: [{ username: username }, { email: email }],
+      },
+    });
 
-      return {
-        username: user.username,
-        email: user.email,
-        token,
-      };
-    } catch (error) {
-      console.log(error);
+    if (userDataExists) {
+      throw new ConflictException("Username or email already registered");
     }
+
+    const saltRounds = 10;
+    const plainToHash = await bcrypt.hash(password, saltRounds);
+    userObject = { ...userObject, password: plainToHash };
+
+    const user = await this.userRepository.create(userObject);
+
+    const payload = { id: user.id, username: user.username };
+    const token = this.jwtAuthService.sign(payload);
+
+    const responseData: LoginResponse = {
+      username: user.username,
+      email: user.email,
+      token,
+    };
+
+    return responseData;
   }
 
   async login(userData: LoginUserDTO): Promise<LoginResponse> {

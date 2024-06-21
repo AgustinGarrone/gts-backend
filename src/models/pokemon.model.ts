@@ -40,6 +40,8 @@ export class Pokemon extends Model<Pokemon> {
 
   @BelongsTo(() => User, "ownerId")
   owner: User;
+
+  ownerId: number;
 }
 
 export const pokemonProvider = [
@@ -48,3 +50,8 @@ export const pokemonProvider = [
     useValue: Pokemon,
   },
 ];
+function Attribute(
+  INTEGER: any,
+): (target: Pokemon, propertyKey: "postId") => void {
+  throw new Error("Function not implemented.");
+}

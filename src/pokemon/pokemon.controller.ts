@@ -56,11 +56,11 @@ export class PokemonController {
   async addPokemon(
     @GetUserFromJwt() user,
     @Body() data: AddPokemonDto,
-  ): Promise<ApiResponse<Pokemon>> {
+  ): Promise<ApiResponse<Pokemon[]>> {
     try {
       const updatePokemon = await this.pokemonService.addPokemon(
         user.userId,
-        data.pokemonId,
+        data.pokemonIds,
       );
       return {
         statusCode: HttpStatus.OK,
@@ -77,16 +77,16 @@ export class PokemonController {
 
   @UseGuards(JwtAuthGuard)
   @Post("/random")
-  async addRandomPokemon(
+  async getRandomPokemon(
     @GetUserFromJwt() user,
   ): Promise<ApiResponse<Pokemon>> {
     try {
-      const randomPokemon = await this.pokemonService.addRandomPokemon(
+      const randomPokemon = await this.pokemonService.getRandomPokemon(
         user.userId,
       );
       return {
         statusCode: HttpStatus.OK,
-        message: "Pokemon agregado con exito",
+        message: "Pokemon obtenido con exito",
         data: randomPokemon,
       };
     } catch (error) {

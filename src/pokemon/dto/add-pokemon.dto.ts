@@ -1,7 +1,18 @@
-import { IsNotEmpty, IsNumber } from "class-validator";
+import {
+  IsArray,
+  ArrayNotEmpty,
+  ArrayMinSize,
+  IsNumber,
+  IsNotEmpty,
+  IsInt,
+} from "class-validator";
 
 export class AddPokemonDto {
-  @IsNumber()
-  @IsNotEmpty()
-  pokemonId: number;
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayMinSize(1)
+  @IsNumber({}, { each: true })
+  @IsInt({ each: true })
+  @IsNotEmpty({ each: true })
+  pokemonIds: number[];
 }

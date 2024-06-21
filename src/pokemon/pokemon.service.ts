@@ -5,8 +5,11 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { Sequelize } from "sequelize-typescript";
+import { Ability } from "src/models/ability.model";
 import { Pokemon } from "src/models/pokemon.model";
+import { Type } from "src/models/type.model";
 import { User } from "src/models/user.model";
+import { Op } from "sequelize";
 
 @Injectable()
 export class PokemonService {
@@ -35,12 +38,7 @@ export class PokemonService {
     }
   }
 
-  async addPokemon(userId: number, pokemonId: number) {
-    const existingPokemon = await this.pokemonRepository.findOne({
-      where: {
-        id: pokemonId,
-      },
-    });
+  async addPokemon(userId: number, pokemonsId: number[]) {
     const existingUser = await this.userRepository.findOne({
       where: {
         id: userId,
@@ -49,22 +47,50 @@ export class PokemonService {
     if (!existingUser) {
       throw new NotFoundException("Usuario no encontrado");
     }
-    if (!existingPokemon) {
+
+    const existingPokemons = await Promise.all(
+      pokemonsId.map(async (id) => {
+        return await this.pokemonRepository.findOne({
+          where: {
+            id,
+          },
+        });
+      }),
+    );
+
+    if (!existingPokemons) {
       throw new NotFoundException("Pokemon no encontrado");
     }
-    if (existingPokemon.ownerId && existingPokemon.ownerId !== userId) {
-      throw new ForbiddenException("Este pokemon ya tiene dueño");
+
+    const anyPokemonOwned = existingPokemons.some(
+      (pokemon) => pokemon.ownerId !== null,
+    );
+
+    if (anyPokemonOwned) {
+      throw new ForbiddenException("Uno o más Pokémon ya tienen dueño");
     }
 
     await this.pokemonRepository.update(
       { ownerId: userId },
-      { where: { id: pokemonId } },
+      {
+        where: {
+          id: {
+            [Op.in]: pokemonsId,
+          },
+        },
+      },
     );
 
-    return await this.pokemonRepository.findOne({ where: { id: pokemonId } });
+    return await this.pokemonRepository.findAll({
+      where: {
+        id: {
+          [Op.in]: pokemonsId,
+        },
+      },
+    });
   }
 
-  async addRandomPokemon(userId: number) {
+  async getRandomPokemon(userId: number) {
     const existingUser = await this.userRepository.findOne({
       where: {
         id: userId,
@@ -80,16 +106,10 @@ export class PokemonService {
         ownerId: null,
       },
       order: [Sequelize.fn("RANDOM")],
+      include: [Ability, Type],
     });
 
-    await this.pokemonRepository.update(
-      { ownerId: userId },
-      { where: { id: randomPokemon.id } },
-    );
-
-    return await this.pokemonRepository.findOne({
-      where: { id: randomPokemon.id },
-    });
+    return randomPokemon;
   }
 
   async deletePokemon(userId: number, pokemonId: number): Promise<void> {

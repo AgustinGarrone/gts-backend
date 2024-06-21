@@ -6,6 +6,8 @@ import {
   UseGuards,
   HttpStatus,
   HttpException,
+  Post,
+  Body,
 } from "@nestjs/common";
 import { PokemonService } from "./pokemon.service";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
@@ -13,6 +15,7 @@ import { JwtAuthGuard } from "src/auth/jwt-auth-guard";
 import { ApiResponse } from "src/constants/types";
 import { Pokemon } from "src/models/pokemon.model";
 import { GetUserFromJwt } from "src/helpers/getUser.helper";
+import { AddPokemonDto } from "./dto/add-pokemon.dto";
 
 @ApiTags("Pokemon")
 @ApiBearerAuth()
@@ -26,7 +29,6 @@ export class PokemonController {
     @Param("userId") userId: number,
     @GetUserFromJwt() user: any,
   ): Promise<ApiResponse<Pokemon[]>> {
-    // Verifica si el usuario autenticado tiene permisos para acceder a userId
     if (user.userId !== userId) {
       throw new HttpException(
         "No tienes permisos para acceder a este recurso",
@@ -49,8 +51,48 @@ export class PokemonController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async addPokemon(
+    @GetUserFromJwt() user,
+    @Body() data: AddPokemonDto,
+  ): Promise<ApiResponse<Pokemon>> {
+    try {
+      const updatePokemon = await this.pokemonService.addPokemon(
+        user.userId,
+        data.pokemonId,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: "Pokemon agregado con exito",
+        data: updatePokemon,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.pokemonService.remove(+id);
+  async deletePokemon(
+    @GetUserFromJwt() user,
+    @Param("id") pokemonId: number,
+  ): Promise<ApiResponse<boolean>> {
+    try {
+      await this.pokemonService.deletePokemon(user.userId, pokemonId);
+      return {
+        statusCode: HttpStatus.OK,
+        message: "Pokémon eliminado con éxito",
+        data: true,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

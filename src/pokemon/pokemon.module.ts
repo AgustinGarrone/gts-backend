@@ -7,12 +7,14 @@ import { abilityProvider } from "src/models/ability.model";
 import { pokemonAbilityProvider } from "src/models/pokemonAbility.model";
 import { pokemonTypesProvider } from "src/models/pokemonTypes.model";
 import { SeedService } from "./seed.service";
+import { userProvider } from "src/models/user.model";
 
 @Module({
   controllers: [PokemonController],
   providers: [
     PokemonService,
     SeedService,
+    ...userProvider,
     ...pokemonProvider,
     ...typeProvider,
     ...abilityProvider,

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { OnApplicationBootstrap } from "@nestjs/common/interfaces";
-import { SeedService } from "./pokemon/seed.service";
+import { SeedService } from "./seed/seed.service";
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -14,6 +14,8 @@ export class AppService implements OnApplicationBootstrap {
 
     if (pokemonCount === 0) {
       await this.seedService.seedPokemons();
+      await this.seedService.seedUsers();
+      await this.seedService.seedTrades();
     }
   }
 }

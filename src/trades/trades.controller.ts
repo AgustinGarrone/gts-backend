@@ -1,34 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TradesService } from './trades.service';
-import { CreateTradeDto } from './dto/create-trade.dto';
-import { UpdateTradeDto } from './dto/update-trade.dto';
+import { Controller, Get, Post, Body, Param } from "@nestjs/common";
+import { TradesService } from "./trades.service";
+import { CreateTradeDto } from "./dto/create-trade.dto";
+import { UpdateTradeDto } from "./dto/update-trade.dto";
 
-@Controller('trades')
+@Controller("trades")
 export class TradesController {
   constructor(private readonly tradesService: TradesService) {}
 
   @Post()
-  create(@Body() createTradeDto: CreateTradeDto) {
-    return this.tradesService.create(createTradeDto);
+  createTrade(@Body() createTradeDto: CreateTradeDto) {
+    return this.tradesService.createTrade(createTradeDto);
   }
 
   @Get()
-  findAll() {
-    return this.tradesService.findAll();
+  getAvailableTrades() {
+    return this.tradesService.getAvailableTrades();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tradesService.findOne(+id);
+  @Post(":id/propose")
+  proposeTrade(@Param("id") id: number) {
+    return this.tradesService.proposeTrade(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTradeDto: UpdateTradeDto) {
-    return this.tradesService.update(+id, updateTradeDto);
+  @Post(":id/reject")
+  rejectTrade(@Param("id") id: number, @Body() updateTradeDto: UpdateTradeDto) {
+    return this.tradesService.rejectTrade(+id, updateTradeDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tradesService.remove(+id);
+  @Post(":id/confirm")
+  confirmTrade(
+    @Param("id") id: number,
+    @Body() updateTradeDto: UpdateTradeDto,
+  ) {
+    return this.tradesService.confirmTrade(+id, updateTradeDto);
   }
 }

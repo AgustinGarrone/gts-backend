@@ -3,6 +3,7 @@ import { Ability } from "src/models/ability.model";
 import { Pokemon } from "src/models/pokemon.model";
 import { PokemonAbility } from "src/models/pokemonAbility.model";
 import { PokemonType } from "src/models/pokemonTypes.model";
+import { Trade } from "src/models/trade.model";
 import { Type } from "src/models/type.model";
 import { User } from "src/models/user.model";
 
@@ -25,6 +26,7 @@ export const databaseProviders = [
         PokemonAbility,
         Type,
         PokemonType,
+        Trade,
       ]);
       await sequelize.sync({ alter: true });
       return sequelize;

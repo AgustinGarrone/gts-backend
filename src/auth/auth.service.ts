@@ -66,7 +66,11 @@ export class AuthService {
 
     if (!checkPassword) throw new HttpException("PASSWORD_INCORRECT", 403);
 
-    const payload = { id: user.id, name: user.username };
+    const payload = {
+      id: user.id,
+      name: user.username,
+      initialPokemons: user.initialPokemons,
+    };
     const token = this.jwtAuthService.sign(payload);
 
     const data: LoginResponse = {
@@ -76,5 +80,27 @@ export class AuthService {
     };
 
     return data;
+  }
+
+  async setInitialPokemons(userId: number): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) throw new HttpException("USER_NOT_FOUND", 404);
+
+    await this.userRepository.update(
+      {
+        initialPokemons: true,
+      },
+      {
+        where: {
+          id: userId,
+        },
+      },
+    );
+
+    return true;
   }
 }

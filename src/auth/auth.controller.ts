@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus } from "@nestjs/common";
+import { Controller, Post, Body, HttpStatus, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import {
   CreateUserDTO,
@@ -7,6 +7,8 @@ import {
 } from "./dto/create-auth.dto";
 import { ApiTags } from "@nestjs/swagger";
 import { ApiResponse } from "src/constants/types";
+import { GetUserFromJwt } from "src/helpers/getUser.helper";
+import { JwtAuthGuard } from "./jwt-auth-guard";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -36,6 +38,22 @@ export class AuthController {
   ): Promise<ApiResponse<LoginResponse>> {
     try {
       const data = await this.authService.login(userData);
+      return {
+        statusCode: HttpStatus.OK,
+        message: "Operación realizada con éxito",
+        data: data,
+      };
+    } catch (error) {
+      console.log(`Error login: ${error}`);
+      throw error;
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post("setInitial")
+  async setInitialPokemons(@GetUserFromJwt() user) {
+    try {
+      const data = await this.authService.setInitialPokemons(user.userId);
       return {
         statusCode: HttpStatus.OK,
         message: "Operación realizada con éxito",

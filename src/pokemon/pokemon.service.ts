@@ -30,6 +30,7 @@ export class PokemonService {
         where: {
           ownerId: userId,
         },
+        include: [Type, Ability],
       });
       return pokemons;
     } catch (error) {

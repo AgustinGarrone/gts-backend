@@ -7,12 +7,12 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { TradesService } from "./trades.service";
 import { CreateTradeDto } from "./dto/create-trade.dto";
-import { UpdateTradeDto } from "./dto/update-trade.dto";
 import { JwtAuthGuard } from "src/auth/jwt-auth-guard";
-import { ApiResponse } from "src/constants/types";
+import { ApiResponse, TradeResponse } from "src/constants/types";
 import { Trade } from "src/models/trade.model";
 import { GetUserFromJwt } from "src/helpers/getUser.helper";
 
@@ -64,22 +64,53 @@ export class TradesController {
 
   @UseGuards(JwtAuthGuard)
   @Post(":id/propose")
-  proposeTrade(@Param("id") id: number) {
-    return this.tradesService.proposeTrade(+id);
+  async proposeTrade(
+    @Param("id", ParseIntPipe) tradeId: number,
+    @Body("pokemonId") pokemonId: number,
+    @GetUserFromJwt() user,
+  ): Promise<ApiResponse<boolean>> {
+    try {
+      await this.tradesService.proposeTrade(+tradeId, user.userId, pokemonId);
+      return {
+        statusCode: HttpStatus.OK,
+        message: "Trade propuesto.",
+        data: true,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(":id/reject")
-  rejectTrade(@Param("id") id: number, @Body() updateTradeDto: UpdateTradeDto) {
-    return this.tradesService.rejectTrade(+id, updateTradeDto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post(":id/confirm")
-  confirmTrade(
-    @Param("id") id: number,
-    @Body() updateTradeDto: UpdateTradeDto,
-  ) {
-    return this.tradesService.confirmTrade(+id, updateTradeDto);
+  @Post(":id/responseProposal")
+  async responseProposal(
+    @Param("id") tradeId: number,
+    @Body("tradeResponse") tradeResponse: TradeResponse,
+    @GetUserFromJwt() user,
+  ): Promise<ApiResponse<TradeResponse>> {
+    try {
+      console.log(tradeResponse);
+      const response = await this.tradesService.responseProposal(
+        +tradeId,
+        user.userId,
+        tradeResponse,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message:
+          response === TradeResponse.CONFIRM
+            ? "Trade confirmado con éxito"
+            : "Trade rechazado con éxito",
+        data: response,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

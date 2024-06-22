@@ -40,7 +40,11 @@ export class Trade extends Model<Trade> {
 
   @Default(TradeState.PENDING)
   @Column({
-    type: DataType.ENUM(TradeState.PENDING, TradeState.COMPLETED),
+    type: DataType.ENUM(
+      TradeState.PENDING,
+      TradeState.PROPOSED,
+      TradeState.COMPLETED,
+    ),
     allowNull: false,
     defaultValue: TradeState.PENDING,
   })

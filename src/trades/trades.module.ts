@@ -3,8 +3,10 @@ import { TradesService } from "./trades.service";
 import { TradesController } from "./trades.controller";
 import { tradeProvider } from "src/models/trade.model";
 import { pokemonProvider } from "src/models/pokemon.model";
+import { DatabaseModule } from "src/database/database.module";
 
 @Module({
+  imports: [DatabaseModule],
   controllers: [TradesController],
   providers: [TradesService, ...tradeProvider, ...pokemonProvider],
 })

@@ -50,8 +50,3 @@ export const pokemonProvider = [
     useValue: Pokemon,
   },
 ];
-function Attribute(
-  INTEGER: any,
-): (target: Pokemon, propertyKey: "postId") => void {
-  throw new Error("Function not implemented.");
-}

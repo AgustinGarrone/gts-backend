@@ -10,10 +10,11 @@ import { typeProvider } from "./models/type.model";
 import { abilityProvider } from "./models/ability.model";
 import { pokemonTypesProvider } from "./models/pokemonTypes.model";
 import { pokemonAbilityProvider } from "./models/pokemonAbility.model";
+import { TradesModule } from './trades/trades.module';
 
 //TODO: modularizar
 @Module({
-  imports: [AuthModule, DatabaseModule, PokemonModule],
+  imports: [AuthModule, DatabaseModule, PokemonModule, TradesModule],
   controllers: [AppController],
   providers: [
     AppService,

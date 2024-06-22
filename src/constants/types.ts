@@ -3,3 +3,8 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+
+export enum TradeState {
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+}

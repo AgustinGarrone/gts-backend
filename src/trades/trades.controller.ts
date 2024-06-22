@@ -15,7 +15,10 @@ import { JwtAuthGuard } from "src/auth/jwt-auth-guard";
 import { ApiResponse, TradeResponse } from "src/constants/types";
 import { Trade } from "src/models/trade.model";
 import { GetUserFromJwt } from "src/helpers/getUser.helper";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Trades")
+@ApiBearerAuth()
 @Controller("trades")
 export class TradesController {
   constructor(private readonly tradesService: TradesService) {}

@@ -149,7 +149,6 @@ export class SeedService {
 
   async seedTrades() {
     try {
-      // Obtener los usuarios creados anteriormente (supongamos que sabemos sus IDs)
       const user1 = await this.userRepository.findOne({
         where: { username: "Ash Ketchum" },
       });
@@ -157,7 +156,6 @@ export class SeedService {
         where: { username: "Misty Waterflower" },
       });
 
-      // Obtener los pokémon asignados a los usuarios
       const pokemonUser1 = await this.pokemonRepository.findAll({
         where: { ownerId: user1.id },
       });

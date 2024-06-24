@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Table, Column, Model, HasMany, Default } from "sequelize-typescript";
 import { Pokemon } from "./pokemon.model";
+import { Notification } from "./notification.model";
 
 @Table({ tableName: "users" })
 export class User extends Model<User> {
@@ -27,6 +28,9 @@ export class User extends Model<User> {
 
   @HasMany(() => Pokemon, "ownerId")
   pokemons: Pokemon[];
+
+  @HasMany(() => Notification, "userId")
+  notifications: Notification[];
 }
 
 export const userProvider = [

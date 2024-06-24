@@ -41,6 +41,7 @@ export class Pokemon extends Model<Pokemon> {
   @BelongsTo(() => User, "ownerId")
   owner: User;
 
+  @ApiProperty()
   ownerId: number;
 }
 

@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import { Ability } from "src/models/ability.model";
+import { Notification } from "src/models/notification.model";
 import { Pokemon } from "src/models/pokemon.model";
 import { PokemonAbility } from "src/models/pokemonAbility.model";
 import { PokemonType } from "src/models/pokemonTypes.model";
@@ -27,6 +28,7 @@ export const databaseProviders = [
         Type,
         PokemonType,
         Trade,
+        Notification,
       ]);
       await sequelize.sync({ alter: true });
       return sequelize;

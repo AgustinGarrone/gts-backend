@@ -14,6 +14,7 @@ import { TradesModule } from "./trades/trades.module";
 import { SeedModule } from "./seed/seed.module";
 import { userProvider } from "./models/user.model";
 import { tradeProvider } from "./models/trade.model";
+import { NotificationModule } from './notification/notification.module';
 
 //TODO: modularizar
 @Module({
@@ -23,6 +24,7 @@ import { tradeProvider } from "./models/trade.model";
     PokemonModule,
     TradesModule,
     SeedModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

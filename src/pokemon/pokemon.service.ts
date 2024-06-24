@@ -24,6 +24,14 @@ export class PokemonService {
     return this.pokemonRepository.count();
   }
 
+  async findByPk(pk: number) {
+    try {
+      return await this.pokemonRepository.findByPk(pk);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async findAll(userId: number) {
     try {
       const pokemons = await this.pokemonRepository.findAll({
@@ -89,6 +97,17 @@ export class PokemonService {
         },
       },
     });
+  }
+
+  async tradePokemonOwnerId(
+    pokemonId: number,
+    newOwnerId: number,
+    transaction?: any,
+  ) {
+    const options = transaction
+      ? { where: { id: pokemonId }, transaction }
+      : { where: { id: pokemonId } };
+    await this.pokemonRepository.update({ ownerId: newOwnerId }, options);
   }
 
   async getRandomPokemon(userId: number) {

@@ -6,21 +6,22 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { CreateTradeDto } from "./dto/create-trade.dto";
-import { Pokemon } from "src/models/pokemon.model";
 import { Trade } from "src/models/trade.model";
 import { TradeResponse, TradeState } from "src/constants/types";
 import { Sequelize } from "sequelize-typescript";
 import { Op } from "sequelize";
+import { NotificationService } from "src/notification/notification.service";
+import { PokemonService } from "src/pokemon/pokemon.service";
 
 @Injectable()
 export class TradesService {
   constructor(
-    @Inject("POKEMON_REPOSITORY")
-    private readonly pokemonRepository: typeof Pokemon,
+    private readonly pokemonService: PokemonService,
     @Inject("TRADE_REPOSITORY")
     private readonly tradeRepository: typeof Trade,
     @Inject("SEQUELIZE")
     private readonly sequelize: Sequelize,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async createTrade(createTradeDto: CreateTradeDto, user): Promise<Trade> {
@@ -30,7 +31,7 @@ export class TradesService {
         "No puedes agregar pokémons a otro usuario",
       );
     }
-    const existingPokemon = await this.pokemonRepository.findByPk(pokemonId);
+    const existingPokemon = await this.pokemonService.findByPk(pokemonId);
     if (!existingPokemon) {
       throw new NotFoundException("Pokémon no encontrado");
     }
@@ -96,7 +97,7 @@ export class TradesService {
       );
     }
 
-    const existingPokemon = await this.pokemonRepository.findByPk(pokemonId);
+    const existingPokemon = await this.pokemonService.findByPk(pokemonId);
     if (!existingPokemon) {
       throw new NotFoundException("Pokémon no encontrado");
     }
@@ -118,6 +119,17 @@ export class TradesService {
           id: tradeId,
         },
       },
+    );
+
+    const ownerPokemon = await this.pokemonService.findByPk(
+      existingTrade.pokemon1Id,
+    );
+
+    const notificationMessage = `El usuario ${userId} quiere intercambiar su pokémon ${existingPokemon.name} por tu ${ownerPokemon.name} `;
+
+    await this.notificationService.createNotification(
+      existingTrade.user1Id,
+      notificationMessage,
     );
 
     return true;
@@ -163,27 +175,25 @@ export class TradesService {
           },
         );
 
-        await this.pokemonRepository.update(
-          {
-            ownerId: existingTrade.user2Id,
-          },
-          {
-            where: { id: existingTrade.pokemon1Id },
-            transaction,
-          },
+        await this.pokemonService.tradePokemonOwnerId(
+          existingTrade.pokemon1Id,
+          existingTrade.user2Id,
+          transaction,
         );
-
-        await this.pokemonRepository.update(
-          {
-            ownerId: existingTrade.user1Id,
-          },
-          {
-            where: { id: existingTrade.pokemon2Id },
-            transaction,
-          },
+        await this.pokemonService.tradePokemonOwnerId(
+          existingTrade.pokemon2Id,
+          existingTrade.user1Id,
+          transaction,
         );
 
         await transaction.commit();
+
+        const notificationMessage = `Tu propuesta de intercambio por tu pokémon ${existingTrade.pokemon2.name} ha sido aceptado. Ahora tienes a ${existingTrade.pokemon1.name}`;
+
+        await this.notificationService.createNotification(
+          existingTrade.user2Id,
+          notificationMessage,
+        );
         return TradeResponse.CONFIRM;
       } catch (error) {
         await transaction.rollback();
@@ -198,6 +208,14 @@ export class TradesService {
           },
         },
       );
+
+      const notificationMessage = `Tu propuesta de intercambio por tu pokémon ${existingTrade.pokemon2.name} para obtener a ${existingTrade.pokemon1.name} ha sido rechazado.`;
+
+      await this.notificationService.createNotification(
+        existingTrade.user2Id,
+        notificationMessage,
+      );
+
       return TradeResponse.REJECT;
     }
   }

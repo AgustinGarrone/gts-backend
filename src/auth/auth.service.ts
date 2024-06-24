@@ -13,13 +13,15 @@ import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import { Op } from "sequelize";
 import { User } from "src/models/user.model";
+import { NotificationService } from "src/notification/notification.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject("USER_REPOSITORY")
-    private userRepository: typeof User,
-    private jwtAuthService: JwtService,
+    private readonly userRepository: typeof User,
+    private readonly jwtAuthService: JwtService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async register(userObject: CreateUserDTO): Promise<LoginResponse> {
@@ -49,6 +51,11 @@ export class AuthService {
       email: user.email,
       token,
     };
+
+    await this.notificationService.createNotification(
+      user.id,
+      "Bienvenido a GTS Pokémon. Aquí podrás intercambiar tus pokémons con otros entrenadores. Buena suerte!",
+    );
 
     return responseData;
   }

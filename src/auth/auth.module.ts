@@ -13,6 +13,7 @@ import { userProvider } from "src/models/user.model";
       signOptions: { expiresIn: "24h" },
     }),
   ],
+  exports: [AuthService],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, ...userProvider],
 })

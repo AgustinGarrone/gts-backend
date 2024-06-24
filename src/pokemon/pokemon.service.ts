@@ -8,16 +8,15 @@ import { Sequelize } from "sequelize-typescript";
 import { Ability } from "src/models/ability.model";
 import { Pokemon } from "src/models/pokemon.model";
 import { Type } from "src/models/type.model";
-import { User } from "src/models/user.model";
 import { Op } from "sequelize";
+import { AuthService } from "src/auth/auth.service";
 
 @Injectable()
 export class PokemonService {
   constructor(
     @Inject("POKEMON_REPOSITORY")
     private readonly pokemonRepository: typeof Pokemon,
-    @Inject("USER_REPOSITORY")
-    private readonly userRepository: typeof User,
+    private readonly userService: AuthService,
   ) {}
 
   countAll() {
@@ -48,11 +47,7 @@ export class PokemonService {
   }
 
   async addPokemon(userId: number, pokemonsId: number[]) {
-    const existingUser = await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-    });
+    const existingUser = await this.userService.findByPk(userId);
     if (!existingUser) {
       throw new NotFoundException("Usuario no encontrado");
     }
@@ -111,11 +106,7 @@ export class PokemonService {
   }
 
   async getRandomPokemon(userId: number) {
-    const existingUser = await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-    });
+    const existingUser = await this.userService.findByPk(userId);
 
     if (!existingUser) {
       throw new NotFoundException("Usuario no encontrado");

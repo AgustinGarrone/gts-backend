@@ -53,6 +53,14 @@ export class AuthService {
     return responseData;
   }
 
+  async findByPk(pk: number) {
+    try {
+      return await this.userRepository.findByPk(pk);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async login(userData: LoginUserDTO): Promise<LoginResponse> {
     const { email, password } = userData;
     const user = await this.userRepository.findOne({

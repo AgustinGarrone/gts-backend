@@ -25,6 +25,7 @@ export class NotificationService {
         where: {
           userId,
         },
+        order: [["createdAt", "DESC"]],
       });
     } catch (error) {
       throw new Error("Failed to get notifications");

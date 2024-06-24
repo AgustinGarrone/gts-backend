@@ -18,4 +18,16 @@ export class NotificationService {
       throw new Error("Failed to create notification");
     }
   }
+
+  async getUserNotifications(userId: number) {
+    try {
+      return await this.notificationRepository.findAll({
+        where: {
+          userId,
+        },
+      });
+    } catch (error) {
+      throw new Error("Failed to get notifications");
+    }
+  }
 }

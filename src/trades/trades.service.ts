@@ -13,6 +13,8 @@ import { Op } from "sequelize";
 import { NotificationService } from "src/notification/notification.service";
 import { PokemonService } from "src/pokemon/pokemon.service";
 import { Pokemon } from "src/models/pokemon.model";
+import { Ability } from "src/models/ability.model";
+import { Type } from "src/models/type.model";
 
 @Injectable()
 export class TradesService {
@@ -68,8 +70,16 @@ export class TradesService {
         state: TradeState.PENDING,
       },
       include: [
-        { model: Pokemon, as: "pokemon1" },
-        { model: Pokemon, as: "pokemon2" },
+        {
+          model: Pokemon,
+          as: "pokemon1",
+          include: [{ model: Ability }, { model: Type }],
+        },
+        {
+          model: Pokemon,
+          as: "pokemon2",
+          include: [{ model: Ability }, { model: Type }],
+        },
       ],
     });
     return response;

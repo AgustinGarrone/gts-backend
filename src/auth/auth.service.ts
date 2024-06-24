@@ -50,6 +50,7 @@ export class AuthService {
       username: user.username,
       email: user.email,
       token,
+      initialPokemons: false,
     };
 
     await this.notificationService.createNotification(
@@ -92,6 +93,7 @@ export class AuthService {
       email: user.email,
       username: user.username,
       token,
+      initialPokemons: user.initialPokemons,
     };
 
     return data;

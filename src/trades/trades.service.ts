@@ -15,6 +15,7 @@ import { PokemonService } from "src/pokemon/pokemon.service";
 import { Pokemon } from "src/models/pokemon.model";
 import { Ability } from "src/models/ability.model";
 import { Type } from "src/models/type.model";
+import { User } from "src/models/user.model";
 
 @Injectable()
 export class TradesService {
@@ -64,10 +65,13 @@ export class TradesService {
     return createTrade;
   }
 
-  async getAvailableTrades(): Promise<Trade[]> {
+  async getAvailableTrades(userId: number): Promise<Trade[]> {
     const response = await this.tradeRepository.findAll({
       where: {
         state: TradeState.PENDING,
+        id: {
+          [Op.not]: userId,
+        },
       },
       include: [
         {
@@ -80,13 +84,28 @@ export class TradesService {
           as: "pokemon2",
           include: [{ model: Ability }, { model: Type }],
         },
+        {
+          model: User,
+          as: "user1",
+        },
+        {
+          model: User,
+          as: "user2",
+        },
       ],
     });
     return response;
   }
 
   async proposeTrade(tradeId: number, userId: number, pokemonId: number) {
-    const existingTrade = await this.tradeRepository.findByPk(tradeId);
+    const existingTrade = await this.tradeRepository.findByPk(tradeId, {
+      include: [
+        {
+          model: Pokemon,
+          as: "pokemon1",
+        },
+      ],
+    });
 
     const pokemonAlreadyInTrade = await this.tradeRepository.findOne({
       where: {
@@ -145,6 +164,11 @@ export class TradesService {
     await this.notificationService.createNotification(
       existingTrade.user1Id,
       notificationMessage,
+    );
+
+    await this.notificationService.createNotification(
+      userId,
+      `Has ofrecido a ${existingPokemon.name} a cambio de ${existingTrade.pokemon1.name}. Debes esperar la respuesta del dueño. Buena suerte`,
     );
 
     return true;

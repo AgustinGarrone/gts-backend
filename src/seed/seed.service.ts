@@ -116,6 +116,12 @@ export class SeedService {
             password: hashedPassword,
             initialPokemons: true,
           },
+          {
+            username: "Brock",
+            email: "brock@gmail.com",
+            password: hashedPassword,
+            initialPokemons: true,
+          },
         ],
         { transaction },
       );
@@ -137,6 +143,14 @@ export class SeedService {
           { ownerId: createdUsers[1].id },
           { where: { id: 4 }, transaction },
         ),
+        this.pokemonRepository.update(
+          { ownerId: createdUsers[2].id },
+          { where: { id: 5 }, transaction },
+        ),
+        this.pokemonRepository.update(
+          { ownerId: createdUsers[2].id },
+          { where: { id: 6 }, transaction },
+        ),
       ]);
 
       await transaction.commit();
@@ -156,11 +170,18 @@ export class SeedService {
         where: { username: "Misty Waterflower" },
       });
 
+      const user3 = await this.userRepository.findOne({
+        where: { username: "Brock" },
+      });
+
       const pokemonUser1 = await this.pokemonRepository.findAll({
         where: { ownerId: user1.id },
       });
       const pokemonUser2 = await this.pokemonRepository.findAll({
         where: { ownerId: user2.id },
+      });
+      const pokemonUser3 = await this.pokemonRepository.findAll({
+        where: { ownerId: user3.id },
       });
 
       const tradesToCreate = [
@@ -182,6 +203,16 @@ export class SeedService {
         {
           user1Id: user2.id,
           pokemon1Id: pokemonUser2[1].id,
+          state: TradeState.PENDING,
+        },
+        {
+          user1Id: user3.id,
+          pokemon1Id: pokemonUser3[0].id,
+          state: TradeState.PENDING,
+        },
+        {
+          user1Id: user3.id,
+          pokemon1Id: pokemonUser3[1].id,
           state: TradeState.PENDING,
         },
       ];

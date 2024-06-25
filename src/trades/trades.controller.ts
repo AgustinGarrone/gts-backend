@@ -49,9 +49,13 @@ export class TradesController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAvailableTrades(): Promise<ApiResponse<Trade[]>> {
+  async getAvailableTrades(
+    @GetUserFromJwt() user,
+  ): Promise<ApiResponse<Trade[]>> {
     try {
-      const availableTrades = await this.tradesService.getAvailableTrades();
+      const availableTrades = await this.tradesService.getAvailableTrades(
+        user.userId,
+      );
       return {
         statusCode: HttpStatus.OK,
         message: "Trades obtenidos con éxito",

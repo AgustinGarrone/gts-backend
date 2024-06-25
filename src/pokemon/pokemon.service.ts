@@ -10,12 +10,15 @@ import { Pokemon } from "src/models/pokemon.model";
 import { Type } from "src/models/type.model";
 import { Op } from "sequelize";
 import { AuthService } from "src/auth/auth.service";
+import { Trade } from "src/models/trade.model";
 
 @Injectable()
 export class PokemonService {
   constructor(
     @Inject("POKEMON_REPOSITORY")
     private readonly pokemonRepository: typeof Pokemon,
+    @Inject("TRADE_REPOSITORY")
+    private readonly tradeRepository: typeof Trade,
     private readonly userService: AuthService,
   ) {}
 
@@ -138,8 +141,21 @@ export class PokemonService {
       );
     }
 
+    const pokemonInTrade = await this.tradeRepository.findOne({
+      where: {
+        state: ["PENDING", "PROPOSED"],
+        [Op.or]: [{ pokemon1Id: pokemonId }, { pokemon2Id: pokemonId }],
+      },
+    });
+
+    if (pokemonInTrade) {
+      throw new ForbiddenException(
+        "No puedes eliminar un pokémon con intercambio pendiente.",
+      );
+    }
+
     await this.pokemonRepository.update(
-      { ownerId: userId },
+      { ownerId: null },
       { where: { id: pokemonId } },
     );
   }

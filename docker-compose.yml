@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:14.3
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: gts-pokemon-db
+      POSTGRES_PASSWORD: admin
+  app:
+    image: gts-pokemon
+    ports:
+      - 3000:3000

@@ -14,11 +14,11 @@ export const databaseProviders = [
     useFactory: async () => {
       const sequelize = new Sequelize({
         dialect: "postgres",
-        host: "localhost",
+        host: "db",
         port: 5432,
-        username: "postgres",
+        username: "admin",
         password: "admin",
-        database: "gts-pokemon",
+        database: "gts-pokemon-db",
         logging: false,
       });
       sequelize.addModels([

@@ -98,10 +98,10 @@ export class PokemonController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(":id")
+  @Delete(":pokemonId")
   async deletePokemon(
     @GetUserFromJwt() user,
-    @Param("id") pokemonId: number,
+    @Param("pokemonId") pokemonId: number,
   ): Promise<ApiResponse<boolean>> {
     try {
       await this.pokemonService.deletePokemon(user.userId, pokemonId);

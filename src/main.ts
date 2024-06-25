@@ -19,8 +19,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle("Haciendola API REST")
-    .setDescription("Api rest realizada para el challenge de Haciendola")
+    .setTitle("GTS Pokémon API REST")
+    .setDescription("Api rest del sistema GTS de Pokémon")
     .setVersion("1.0")
     .addBearerAuth()
     .build();

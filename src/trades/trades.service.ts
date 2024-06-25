@@ -181,7 +181,7 @@ export class TradesService {
 
     if (pokemonAlreadyInTrade) {
       throw new BadRequestException(
-        "Este pokémon se encuentra en un trade pendiente. Espera a que finalice para intentar otro trade.",
+        "Este pokémon se encuentra en un trade pendiente.",
       );
     }
 

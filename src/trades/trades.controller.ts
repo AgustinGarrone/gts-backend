@@ -70,6 +70,26 @@ export class TradesController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get("/user")
+  async getUserTrades(@GetUserFromJwt() user): Promise<ApiResponse<Trade[]>> {
+    try {
+      const availableTrades = await this.tradesService.getUserTrades(
+        user.userId,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: "Trades obtenidos con éxito",
+        data: availableTrades,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post(":id/propose")
   async proposeTrade(
     @Param("id", ParseIntPipe) tradeId: number,

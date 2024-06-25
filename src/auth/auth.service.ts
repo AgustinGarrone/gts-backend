@@ -84,8 +84,7 @@ export class AuthService {
 
     const payload = {
       id: user.id,
-      name: user.username,
-      initialPokemons: user.initialPokemons,
+      username: user.username,
     };
     const token = this.jwtAuthService.sign(payload);
 

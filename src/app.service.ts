@@ -9,13 +9,20 @@ export class AppService implements OnApplicationBootstrap {
   async onApplicationBootstrap(): Promise<any> {
     const pokemonCount = await this.seedService.countAll();
 
-    console.log("POKEMON COUNT ES ");
-    console.log(pokemonCount);
-
     if (pokemonCount === 0) {
+      console.log("CARGANDO DATOS EN LA BASE.... ESPERE.");
+
+      const interval = setInterval(() => {
+        console.log("Cargando datos...");
+      }, 2000);
+
+      // Ejecutar los seeds
       await this.seedService.seedPokemons();
       await this.seedService.seedUsers();
       await this.seedService.seedTrades();
+
+      clearInterval(interval);
+      console.log("Base de datos cargada correctamente");
     }
   }
 }

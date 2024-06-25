@@ -69,9 +69,18 @@ export class TradesService {
     const response = await this.tradeRepository.findAll({
       where: {
         state: TradeState.PENDING,
-        id: {
-          [Op.not]: userId,
-        },
+        [Op.or]: [
+          {
+            user1Id: {
+              [Op.not]: userId,
+            },
+          },
+          {
+            user2Id: {
+              [Op.not]: userId,
+            },
+          },
+        ],
       },
       include: [
         {
@@ -95,6 +104,61 @@ export class TradesService {
       ],
     });
     return response;
+  }
+
+  async getUserTrades(userId: number): Promise<Trade[]> {
+    const response = await this.tradeRepository.findAll({
+      where: {
+        //state: [TradeState.COMPLETED, TradeState.PROPOSED],
+        [Op.or]: [
+          {
+            user1Id: {
+              [Op.eq]: userId,
+            },
+          },
+          {
+            user2Id: {
+              [Op.eq]: userId,
+            },
+          },
+        ],
+      },
+      include: [
+        {
+          model: Pokemon,
+          as: "pokemon1",
+          include: [{ model: Ability }, { model: Type }],
+        },
+        {
+          model: Pokemon,
+          as: "pokemon2",
+          include: [{ model: Ability }, { model: Type }],
+        },
+        {
+          model: User,
+          as: "user1",
+          attributes: ["username"],
+        },
+        {
+          model: User,
+          as: "user2",
+          attributes: ["username"],
+        },
+      ],
+    });
+
+    const statePriority = {
+      [TradeState.PROPOSED]: 1,
+      [TradeState.PENDING]: 2,
+      [TradeState.COMPLETED]: 3,
+    };
+
+    // Ordenamos los resultados según la prioridad de los estados
+    const orderedResponse = response.sort((a, b) => {
+      return statePriority[a.state] - statePriority[b.state];
+    });
+
+    return orderedResponse;
   }
 
   async proposeTrade(tradeId: number, userId: number, pokemonId: number) {
@@ -159,7 +223,7 @@ export class TradesService {
       existingTrade.pokemon1Id,
     );
 
-    const notificationMessage = `El usuario ${userId} quiere intercambiar su pokémon ${existingPokemon.name} por tu ${ownerPokemon.name} `;
+    const notificationMessage = `Un usuario quiere intercambiar su pokémon ${existingPokemon.name} por tu ${ownerPokemon.name} `;
 
     await this.notificationService.createNotification(
       existingTrade.user1Id,
@@ -184,7 +248,20 @@ export class TradesService {
     if (!isResponseValid) {
       throw new BadRequestException("Verifique su respuesta al trade.");
     }
-    const existingTrade = await this.tradeRepository.findByPk(tradeId);
+    const existingTrade = await this.tradeRepository.findByPk(tradeId, {
+      include: [
+        {
+          model: Pokemon,
+          as: "pokemon1",
+          attributes: ["name"],
+        },
+        {
+          model: Pokemon,
+          as: "pokemon2",
+          attributes: ["name"],
+        },
+      ],
+    });
 
     if (!existingTrade) {
       throw new NotFoundException(`Trade ${tradeId} no encontrado`);
@@ -235,7 +312,6 @@ export class TradesService {
         );
         return TradeResponse.CONFIRM;
       } catch (error) {
-        await transaction.rollback();
         throw new BadRequestException("Error al procesar el intercambio");
       }
     } else if (tradeResponse === TradeResponse.REJECT) {

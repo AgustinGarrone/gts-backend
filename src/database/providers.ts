@@ -19,6 +19,7 @@ export const databaseProviders = [
         username: "postgres",
         password: "admin",
         database: "gts-pokemon",
+        logging: false,
       });
       sequelize.addModels([
         User,

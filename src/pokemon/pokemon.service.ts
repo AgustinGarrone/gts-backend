@@ -40,7 +40,15 @@ export class PokemonService {
         where: {
           ownerId: userId,
         },
-        include: [Type, Ability],
+        include: [
+          {
+            model: Type,
+          },
+          {
+            model: Ability,
+            order: [["id", "ASC"]],
+          },
+        ],
       });
       return pokemons;
     } catch (error) {

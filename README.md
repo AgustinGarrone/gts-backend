@@ -46,4 +46,4 @@ Y listo!
 Visitando /docs encuentra la documentación del api rest
 **http://localhost:3000/docs**
 
-Además de una colección de thunderClient en formato json
+Además de una colección de Postman en formato json para importar

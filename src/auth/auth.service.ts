@@ -47,6 +47,7 @@ export class AuthService {
     const token = this.jwtAuthService.sign(payload);
 
     const responseData: LoginResponse = {
+      id: user.id,
       username: user.username,
       email: user.email,
       token,
@@ -89,6 +90,7 @@ export class AuthService {
     const token = this.jwtAuthService.sign(payload);
 
     const data: LoginResponse = {
+      id: user.id,
       email: user.email,
       username: user.username,
       token,

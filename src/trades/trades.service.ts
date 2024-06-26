@@ -32,7 +32,7 @@ export class TradesService {
     const { userId, pokemonId } = createTradeDto;
     if (user.userId !== userId) {
       throw new UnauthorizedException(
-        "No puedes agregar pokémons a otro usuario",
+        "no puedes crear un trade a otro usuario",
       );
     }
     const existingPokemon = await this.pokemonService.findByPk(pokemonId);
